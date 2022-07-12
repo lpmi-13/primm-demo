@@ -1,25 +1,99 @@
+import { useEffect, useState } from 'react';
+import classNames from 'classnames';
+import { motion } from 'framer-motion';
+
+import { items } from './items';
 import './App.css';
 
-const code1 = `
-def multiply(number):
-    return number * 2`;
-const code2 = `multiply(10)`;
+const PAUSE_LENGTH = 2000;
 
-function App() {
+const App = () => {
+
+  const [listIndex, setListIndex] = useState(0);
+  const [functionFromList, setFunctionFromList] = useState(items[listIndex])
+
+  const [prediction, setPrediction] = useState('');
+  const [resultSuccess, setResultSuccess] = useState(false);
+  const [result, setResult] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    setIsUpdating(false);
+    setFunctionFromList(items[listIndex]);
+  }, [listIndex])
+
+  const showResult = (answer, prediction) => {
+    console.log(answer)
+    console.log(prediction)
+    if (answer === prediction) {
+      setResult(true);
+      setResultSuccess(true);
+      setTimeout(() => {
+        setResultSuccess(false);
+        setResult(false);
+      }, PAUSE_LENGTH);
+    } else {
+      setResult(true);
+      setTimeout(() => setResult(false), 2000)
+    }
+  }
+
+  const handleUpdate = (event) => setPrediction(event.target.value);
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    showResult(functionFromList.answer, prediction);
+  }
+
+  const itemsLength = items.length;
+
+  // move back one, unless we're at the beginning, then go to the last item
+  const indexToMoveBackTo = () => listIndex <= 0 ? itemsLength - 1 : listIndex - 1;
+  // move forward one, unless we're at the end, then go to the first item
+  const indexToMoveForwardTo = () => listIndex >= itemsLength - 1 ? 0 : listIndex + 1;
+
+  // move back and forward in the code snippets
+  const handleArrowClick = (indexFunction) => {
+    setIsUpdating(true);
+    setIsLoading(true);
+    setPrediction('');
+    setTimeout(() => {
+      setListIndex(indexFunction());
+      setIsLoading(false);
+    }, PAUSE_LENGTH);
+  }
+
   return (
     <div className="App">
       <header className="App-header">
         <h1>PRIMM Demo</h1>
-        <div className="display">
-          <code>
-            {code1}
-          </code>
-           <br></br>
-          <code>
-            {code2}
-          </code> 
-        </div>
       </header>
+      <div className="display">
+        <div role="button" className="swipe-arrows">
+          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} aria-label="previous function" className="left-arrow" onClick={() => handleArrowClick(indexToMoveBackTo)}>
+            previous
+          </motion.button>
+          <motion.button  whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}aria-label="next function" className="right-arrow" onClick={() => handleArrowClick(indexToMoveForwardTo)}>
+            next
+          </motion.button>
+        </div>
+        <pre className="code">
+          {isLoading ? "we're loading..." : functionFromList.code}
+        </pre>
+        <div className="predict">
+          <form onSubmit={onSubmit}>
+            <label>
+              What will this function return?
+              <input type="text" value={prediction} className="guess" onChange={handleUpdate} name="predict"/>
+            </label>
+            <input className="input" type="submit"></input>
+          </form>
+        </div>
+        <div className={classNames("success", result ? "" : "hidden")}>
+          <h3>{resultSuccess ? "You got it!" : "Try again"}</h3>
+        </div>
+      </div>
     </div>
   );
 }
