@@ -15,11 +15,9 @@ const App = () => {
   const [prediction, setPrediction] = useState('');
   const [resultSuccess, setResultSuccess] = useState(false);
   const [result, setResult] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    setIsUpdating(false);
     setFunctionFromList(items[listIndex]);
   }, [listIndex])
 
@@ -55,7 +53,6 @@ const App = () => {
 
   // move back and forward in the code snippets
   const handleArrowClick = (indexFunction) => {
-    setIsUpdating(true);
     setIsLoading(true);
     setPrediction('');
     setTimeout(() => {
