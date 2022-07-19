@@ -4,7 +4,7 @@ export const items = [
   def greet(name):
       return f"hi there, {name}"
   
-  greet(Sue)`,
+  greet("Sue")`,
     answer : 'hi there, Sue'
   },
   {
@@ -34,7 +34,7 @@ export const items = [
           reversed.insert(0, string[i])
       return ''.join(reversed)
   
-  reverse(correct order)`,
+  reverse("correct order")`,
     answer : 'redro tcerroc'
   },
   {
