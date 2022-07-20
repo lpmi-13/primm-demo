@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { motion } from 'framer-motion';
 
-import { items } from './items';
+import { SupplyTypeInput } from './SupplyTypeInput';
+import { SelectTypeInput } from './SelectTypeInput';
+import { items, SUPPLY_ITEM } from './items';
 import './App.css';
 
 const PAUSE_LENGTH = 2000;
@@ -11,6 +13,7 @@ const App = () => {
 
   const [listIndex, setListIndex] = useState(0);
   const [functionFromList, setFunctionFromList] = useState(items[listIndex])
+  const [itemType, setItemType] = useState({})
 
   const [prediction, setPrediction] = useState('');
   const [resultSuccess, setResultSuccess] = useState(false);
@@ -19,11 +22,10 @@ const App = () => {
 
   useEffect(() => {
     setFunctionFromList(items[listIndex]);
+    setItemType(items[listIndex].type)
   }, [listIndex])
 
   const showResult = (answer, prediction) => {
-    console.log(answer)
-    console.log(prediction)
     if (answer === prediction) {
       setResult(true);
       setResultSuccess(true);
@@ -82,7 +84,11 @@ const App = () => {
           <form onSubmit={onSubmit}>
             <label>
               What will this function return?
-              <input type="text" value={prediction} className="guess" onChange={handleUpdate} name="predict"/>
+              {
+                itemType === SUPPLY_ITEM
+                ? <SupplyTypeInput prediction={prediction} handleUpdate={handleUpdate} />
+                : <SelectTypeInput prediction={prediction} choices={functionFromList.selections} handleUpdate={handleUpdate} />
+              }
             </label>
             <input className="input" type="submit"></input>
           </form>
